@@ -1,4 +1,4 @@
-import { Suspense } from "react"
+import { Suspense, useEffect } from "react"
 import Link from "next/link"
 import Layout from "src/core/layouts/Layout"
 import { useCurrentUser } from "src/users/hooks/useCurrentUser"
@@ -7,8 +7,7 @@ import { useMutation } from "@blitzjs/rpc"
 import { Routes, BlitzPage } from "@blitzjs/next"
 import styles from "src/styles/Home.module.css"
 
-import { ConnectWallet } from "@thirdweb-dev/react";
-import { ThirdwebProvider } from "@thirdweb-dev/react";
+import { ConnectWallet, useAddress, useNetwork, useNetworkMismatch, ChainId } from "@thirdweb-dev/react";
 
 /*
  * This file is just for a pleasant getting started page for your new app.
@@ -63,16 +62,31 @@ import { ThirdwebProvider } from "@thirdweb-dev/react";
 //   )
 // }
 
+
 const Home: BlitzPage = () => {
+
+  const address = useAddress();
+  const [, switchNetwork] = useNetwork();
+  const isWrongNetwork = useNetworkMismatch();
+
+  useEffect(() => {
+    if (isWrongNetwork && switchNetwork) {
+      setTimeout(() => {
+        switchNetwork(ChainId.Mumbai);
+      }, 2000);
+    }
+  }, [address, isWrongNetwork, switchNetwork]);
+
   return (
-    <ThirdwebProvider>
+    <div style={{width: "300px"}}>
       <ConnectWallet
-        accentColor="#fff"
+        accentColor={isWrongNetwork? "grey" : "navy"}
         colorMode="dark"
         btnTitle="Connect Wallet"
       />
-    </ThirdwebProvider>
-  )
+      {isWrongNetwork? <p>Wrong Network, Please switchNetwork!!!</p> : <p></p>}
+    </div>
+  );
 };
 
 export default Home
