@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from "react"
+import { Suspense, useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import Layout from "src/core/layouts/Layout"
 import { useCurrentUser } from "src/users/hooks/useCurrentUser"
@@ -7,91 +7,58 @@ import { useMutation } from "@blitzjs/rpc"
 import { Routes, BlitzPage } from "@blitzjs/next"
 import styles from "src/styles/Home.module.css"
 
-import { ConnectWallet, useAddress, useNetwork, useNetworkMismatch, ChainId } from "@thirdweb-dev/react";
-
 /*
  * This file is just for a pleasant getting started page for your new app.
  * You can delete everything in here and start from scratch if you like.
  */
 
-// const UserInfo = () => {
-//   const currentUser = useCurrentUser()
-//   const [logoutMutation] = useMutation(logout)
+const UserInfo = () => {
+  const currentUser = useCurrentUser()
+  const [logoutMutation] = useMutation(logout)
 
-//   if (currentUser) {
-//     return (
-//       <>
-//         <button
-//           className={styles.button}
-//           onClick={async () => {
-//             await logoutMutation()
-//           }}
-//         >
-//           Logout
-//         </button>
-//         <div>
-//           User id: <code>{currentUser.id}</code>
-//           <br />
-//           User role: <code>{currentUser.role}</code>
-//         </div>
-//       </>
-//     )
-//   } else {
-//     return (
-//       <>
-//         <Link href={Routes.SignupPage()} className={styles.button}>
-//           <strong>Sign Up</strong>
-//         </Link>
-//         <Link href={Routes.LoginPage()} className={styles.loginButton}>
-//           <strong>Login</strong>
-//         </Link>
-//       </>
-//     )
-//   }
-// }
-
-// const Home: BlitzPage = () => {
-//   return (
-//     <div>
-//       <h1>Hello, world!</h1>
-
-//       <Suspense fallback="Loading...">
-//         <UserInfo />
-//       </Suspense>
-//     </div>
-//   )
-// }
-
+  if (currentUser) {
+    return (
+      <>
+        <button
+          className={styles.button}
+          onClick={async () => {
+            await logoutMutation()
+          }}
+        >
+          Logout
+        </button>
+        <div>
+          User id: <code>{currentUser.id}</code>
+          <br />
+          User role: <code>{currentUser.role}</code>
+        </div>
+      </>
+    )
+  } else {
+    return (
+      <>
+        <Link href={Routes.SignupPage()} className={styles.button}>
+          <strong>Sign Up</strong>
+        </Link>
+        <Link href={Routes.LoginPage()} className={styles.loginButton}>
+          <strong>Login</strong>
+        </Link>
+      </>
+    )
+  }
+}
 
 const Home: BlitzPage = () => {
-
-  const address = useAddress();
-  const [, switchNetwork] = useNetwork();
-  const isWrongNetwork = useNetworkMismatch();
-
-  useEffect(() => {
-    if (isWrongNetwork && switchNetwork) {
-      setTimeout(() => {
-        switchNetwork(ChainId.Mumbai);
-      }, 2000);
-    }
-  }, [address, isWrongNetwork, switchNetwork]);
-
   return (
-    <div style={{
-      width: "300px",
-      position: 'absolute', 
-      left: '50%', top: '50%',
-      transform: 'translate(-50%, -50%)'
-      }}>
-      <ConnectWallet
-        accentColor={isWrongNetwork? "grey" : "navy"}
-        colorMode="dark"
-        btnTitle="Connect Wallet"
-      />
-      {isWrongNetwork? <p>Wrong Network, Please switchNetwork!!!</p> : <p></p>}
+    <div>
+      <h1>Hello, world!</h1>
+
+      <Suspense fallback="Loading...">
+        <UserInfo />
+      </Suspense>
     </div>
-  );
-};
+  )
+}
+
 
 export default Home
